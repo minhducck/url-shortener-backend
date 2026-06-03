@@ -1,7 +1,18 @@
-import {ApiProperty} from '@nestjs/swagger';
-import {IsDateString, IsNotEmpty, IsOptional, IsString, IsUrl} from "class-validator";
+import { ModelDefinition, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { ApiProperty, ApiSchema } from '@nestjs/swagger';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
+@ApiSchema()
+@Schema()
 export class UrlModel {
+  @Prop({ unique: true, isRequired: true, index: true })
   @ApiProperty({
     nullable: false,
     description: 'Shorten URL',
@@ -9,7 +20,8 @@ export class UrlModel {
   })
   readonly shortcode: string;
 
-  @ApiProperty({nullable: false, description: 'Original URL'})
+  @Prop({ isRequired: true })
+  @ApiProperty({ nullable: false, description: 'Original URL' })
   @IsNotEmpty()
   @IsUrl({
     allow_fragments: false,
@@ -22,11 +34,17 @@ export class UrlModel {
   })
   original_url: string;
 
-  @ApiProperty({nullable: true, description: 'URL expiration date'})
+  @Prop({
+    type: 'Date',
+    allowNull: true,
+    default: null,
+  })
+  @ApiProperty({ nullable: true, description: 'URL expiration date' })
   @IsOptional()
-  @IsDateString({strict: true})
+  @IsDateString({ strict: true })
   expiration_date: Date | null;
 
+  @Prop({ allowNull: true, default: null })
   @ApiProperty({
     nullable: false,
     description: 'Password to update the existing URL',
@@ -36,6 +54,15 @@ export class UrlModel {
   @IsNotEmpty()
   password: string;
 
-  @ApiProperty({nullable: false, description: 'Created date'})
+  @Prop()
+  @ApiProperty({ nullable: false, description: 'Created date' })
   readonly created_at: Date;
 }
+
+export type UrlDocument = HydratedDocument<UrlModel>;
+
+export const UrlSchema = SchemaFactory.createForClass(UrlModel);
+export const UrlModelDefinition: ModelDefinition = {
+  name: 'urls',
+  schema: UrlSchema,
+};
