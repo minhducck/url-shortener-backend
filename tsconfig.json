@@ -27,6 +27,12 @@
       ],
       "@libs/common/*": [
         "libs/common/src/*"
+      ],
+      "@libs/mongoose-connector": [
+        "libs/mongoose-connector/src"
+      ],
+      "@libs/mongoose-connector/*": [
+        "libs/mongoose-connector/src/*"
       ]
     }
   }
