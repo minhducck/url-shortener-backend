@@ -28,13 +28,13 @@
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
     },
-    "core": {
+    "shortener": {
       "type": "application",
-      "root": "apps/core",
+      "root": "apps/shortener",
       "entryFile": "main",
-      "sourceRoot": "apps/core/src",
+      "sourceRoot": "apps/shortener/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/core/tsconfig.app.json"
+        "tsConfigPath": "apps/shortener/tsconfig.app.json"
       }
     }
   }

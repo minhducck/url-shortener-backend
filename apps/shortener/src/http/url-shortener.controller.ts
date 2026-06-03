@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { CoreService } from '../service/core.service';
+import { ShortenerService } from '../service/shortener.service';
 import {
   ApiBody,
   ApiCreatedResponse,
@@ -21,18 +21,22 @@ import {
 } from '@nestjs/swagger';
 import { UrlModel } from '../model/url.model';
 import { UrlCreationDto } from '../dto/url-creation.dto';
+import {AlreadyExistedException} from "@libs/common/exception/already-existed.exception";
 
-@Controller('/urls')
+@Controller({
+  version: '1',
+  path: '/urls',
+})
 @ApiTags('Url Shortener')
 export class UrlShortenerController {
-  constructor(private readonly coreService: CoreService) {}
+  constructor(private readonly coreService: ShortenerService) {}
 
-  @Get(':shortened_code')
-  @ApiParam({ name: 'shortened_code', description: 'Url shortener' })
+  @Get(':code')
+  @ApiParam({ name: 'code', description: 'Url shortener' })
   @ApiOperation({ summary: 'Retrieve URL metadata by shortened code.' })
   @ApiResponse({ status: 200, description: 'Found the URL' })
   @ApiResponse({ status: 404, description: 'Shorted URL does not exist' })
-  getUrlSetting(@Param('shortened_code') code: string): UrlModel {
+  getUrlSetting(@Param('code') code: string): UrlModel {
     return this.coreService.getUrlByCode(code);
   }
 
@@ -40,30 +44,32 @@ export class UrlShortenerController {
   @ApiOperation({ summary: 'Create shorten link for URL' })
   @ApiCreatedResponse({ description: 'URL shorten has been created.' })
   @ApiBody({ type: UrlCreationDto })
-  create(@Body() metadata: UrlCreationDto) {
+  async create(@Body() metadata: UrlCreationDto) {
     /**
      * @Todo: Validate input
      *  - original: Must be a valid URL
      *  - customURL: Must be a valid and does not exist in DB
      *  -
      */
-    return metadata;
+
+
+    return this.coreService.create(metadata);
   }
 
-  @Put('/:shortened_code/:password')
+  @Put('/:code/:password')
   @ApiOperation({ summary: 'Update URL metadata by shortened code.' })
   update(
-    @Param('shortened_code') code: string,
+    @Param('code') code: string,
     @Param('password') password: string,
   ) {}
 
-  @Delete('/:shortened_code/:password')
+  @Delete('/:code/:password')
   @ApiOperation({ summary: 'Delete URL metadata by shortened code.' })
   @ApiNotFoundResponse({ description: 'Shorten code does not exist' })
   @ApiForbiddenResponse({ description: 'Password not correct.' })
   @ApiOkResponse({ description: 'URL has been removed' })
   delete(
-    @Param('shortened_code') code: string,
+    @Param('code') code: string,
     @Param('password') password: string,
   ): boolean {
     return true;

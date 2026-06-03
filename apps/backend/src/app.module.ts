@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CommonModule } from '@libs/common';
-import { CoreModule } from '../../core/src/core.module';
+import { ShortenerModule } from '../../shortener/src/shortener.module';
 
 @Module({
-  imports: [CommonModule, CoreModule],
+  imports: [CommonModule, ShortenerModule],
   controllers: [],
   providers: [],
 })
