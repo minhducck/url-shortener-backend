@@ -28,6 +28,15 @@
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
     },
+    "mongoose-connector": {
+      "type": "library",
+      "root": "libs/mongoose-connector",
+      "entryFile": "index",
+      "sourceRoot": "libs/mongoose-connector/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/mongoose-connector/tsconfig.lib.json"
+      }
+    },
     "shortener": {
       "type": "application",
       "root": "apps/shortener",
