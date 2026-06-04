@@ -20,7 +20,6 @@ export class CodeGeneratorService implements OnApplicationBootstrap {
   constructor() {}
 
   async onApplicationBootstrap() {
-    console.log('Initiate global counter');
     this.globalCounterCode = this.configService.get(
       'GLOBAL_COUNTER_CODE',
       'GLOBAL_COUNTER',
@@ -33,11 +32,22 @@ export class CodeGeneratorService implements OnApplicationBootstrap {
     if (isExist === null) {
       await this.globalCounterModel.insertOne({
         code: this.globalCounterCode,
+        counter: 100000,
       });
     }
   }
 
-  async generateCodes(numberOfCodes: number = 1): Promise<string[]> {
+  async generateCode(): Promise<string> {
+    const afterUpdate =
+      await this.globalCounterModel.findOneAndUpdate<GlobalCounterDocument>(
+        { code: { $eq: this.globalCounterCode } },
+        { $inc: { counter: 1 } },
+        { returnDocument: 'after' },
+      );
+    return toBase62(afterUpdate?.counter || 1);
+  }
+
+  async generateCodes(numberOfCodes: number = 1): Promise<string[] | string> {
     /** @Todo: Generate next code.
      * Action must be atomic to get rid of race-condition.
      */
@@ -52,7 +62,7 @@ export class CodeGeneratorService implements OnApplicationBootstrap {
 
     const afterUpdate =
       await this.globalCounterModel.findOneAndUpdate<GlobalCounterDocument>(
-        { code: { $eq: 'GLOBAL_COUNTER' } },
+        { code: { $eq: this.globalCounterCode } },
         { $inc: { counter: numberOfCodes } },
         { returnDocument: 'after' },
       );

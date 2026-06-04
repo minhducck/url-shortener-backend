@@ -1,18 +1,22 @@
 import {
-  BadRequestException,
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Post,
   Put,
   Query,
+  SerializeOptions,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ShortenerService } from '../service/shortener.service';
 import {
   ApiBody,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
@@ -22,17 +26,22 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UrlModel } from '../model/url.model';
 import { UrlCreationDto } from '../dto/url-creation.dto';
 import { CodeGeneratorService } from '../service/code-generator.service';
 import { UrlBuilderInterceptor } from '../interceptor/url-builder.interceptor';
+import { PasswordProtectedGuard } from '../guard/password-protected.guard';
+import { UrlUpdateDto } from '../dto/url-update.dto';
+import { UrlOutputDto } from '../dto/url-output.dto';
+import { wrapTimeMeasure } from '@libs/common/helper/wrap-time-measure';
 
 @Controller({
-  version: '1',
+  version: 'V1',
   path: '/urls',
 })
 @ApiTags('Url Shortener')
 export class UrlShortenerController {
+  private readonly logger: Logger = new Logger('UrlShortenerController');
+
   constructor(
     private readonly coreService: ShortenerService,
     private readonly codeGen: CodeGeneratorService,
@@ -44,11 +53,16 @@ export class UrlShortenerController {
   }
 
   @Get(':code')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @UseInterceptors(UrlBuilderInterceptor)
+  @SerializeOptions({
+    excludePrefixes: ['_'],
+  })
   @ApiParam({ name: 'code', description: 'Url shortener' })
   @ApiOperation({ summary: 'Retrieve URL metadata by shortened code.' })
   @ApiResponse({ status: 200, description: 'Found the URL' })
   @ApiResponse({ status: 404, description: 'Shorted URL does not exist' })
-  getUrlSetting(@Param('code') code: string) {
+  getUrlSetting(@Param('code') code: string): Promise<UrlOutputDto> {
     return this.coreService.getUrlByCode(code);
   }
 
@@ -56,33 +70,43 @@ export class UrlShortenerController {
   @ApiOperation({ summary: 'Create shorten link for URL' })
   @ApiCreatedResponse({ description: 'URL shorten has been created.' })
   @ApiBody({ type: UrlCreationDto })
+  @ApiConflictResponse({ description: 'Custom URL already exists.' })
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseInterceptors(UrlBuilderInterceptor)
-  async create(@Body() metadata: UrlCreationDto) {
-    /**
-     * @Todo: Validate input
-     *  - adding short_url to the response
-     */
-
-    return this.coreService.create(metadata);
+  @SerializeOptions({
+    excludePrefixes: ['_'],
+  })
+  async create(@Body() metadata: UrlCreationDto): Promise<UrlOutputDto> {
+    return wrapTimeMeasure(
+      () => this.coreService.create(metadata),
+      'Create URL',
+      this.logger,
+    );
   }
 
   @Put('/:code/:password')
+  @UseGuards(PasswordProtectedGuard)
+  @SerializeOptions({
+    excludePrefixes: ['_'],
+  })
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseInterceptors(UrlBuilderInterceptor)
+  @ApiBody({ type: UrlUpdateDto })
   @ApiOperation({ summary: 'Update URL metadata by shortened code.' })
   async update(
     @Param('code') code: string,
     @Param('password') password: string,
-    @Body() content: Omit<UrlModel, 'shortcode' | 'created_at' | 'password'>,
-  ) {
-    if (!(await this.coreService.isAbleToChange(code, password))) {
-      throw new BadRequestException(
-        'Incorrect password or URL does not exist!',
-      );
-    }
-    return this.coreService.update(code, content);
+    @Body() content: UrlUpdateDto,
+  ): Promise<UrlOutputDto> {
+    return wrapTimeMeasure(
+      () => this.coreService.update(code, content),
+      'Update URL',
+      this.logger,
+    );
   }
 
   @Delete('/:code/:password')
+  @UseGuards(PasswordProtectedGuard)
   @ApiOperation({ summary: 'Delete URL metadata by shortened code.' })
   @ApiNotFoundResponse({ description: 'Shorten code does not exist' })
   @ApiForbiddenResponse({ description: 'Password not correct.' })
@@ -91,12 +115,6 @@ export class UrlShortenerController {
     @Param('code') code: string,
     @Param('password') password: string,
   ): Promise<boolean> {
-    if (!(await this.coreService.isAbleToChange(code, password))) {
-      throw new BadRequestException(
-        'Incorrect password or URL does not exist!',
-      );
-    }
-
     await this.coreService.remove(code);
 
     return true;

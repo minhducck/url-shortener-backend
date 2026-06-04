@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Matches,
 } from 'class-validator';
 
 @ApiSchema()
@@ -21,7 +22,11 @@ export class UrlModel {
   readonly shortcode: string;
 
   @Prop({ isRequired: true })
-  @ApiProperty({ nullable: false, description: 'Original URL' })
+  @ApiProperty({
+    nullable: false,
+    description: 'Original URL',
+    example: 'https://google.com/',
+  })
   @IsNotEmpty()
   @IsUrl({
     allow_fragments: false,
@@ -34,12 +39,27 @@ export class UrlModel {
   })
   original_url: string;
 
+  @Prop({ isRequired: false, default: null, index: true })
+  @ApiProperty({
+    nullable: true,
+    description: 'Alias',
+    example: 'hello-world',
+  })
+  @IsString()
+  @Matches(/^[a-zA-Z\-_0-9]+$/)
+  @IsOptional()
+  custom_url?: string;
+
   @Prop({
     type: 'Date',
     allowNull: true,
     default: null,
   })
-  @ApiProperty({ nullable: true, description: 'URL expiration date' })
+  @ApiProperty({
+    nullable: true,
+    description: 'URL expiration date',
+    example: '2026-06-04T12:00:00.000Z',
+  })
   @IsOptional()
   @IsDateString({ strict: true })
   expiration_date: Date | null;

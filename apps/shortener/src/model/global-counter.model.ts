@@ -7,7 +7,7 @@ export class GlobalCounterModel {
   code: string;
 
   @Prop({ default: 0 })
-  readonly counter: number;
+  counter: number;
 }
 
 export type GlobalCounterDocument = HydratedDocument<GlobalCounterModel>;

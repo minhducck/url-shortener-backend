@@ -15,5 +15,6 @@ import { UrlBuilderInterceptor } from './interceptor/url-builder.interceptor';
   ],
   controllers: [UrlShortenerController],
   providers: [ShortenerService, CodeGeneratorService, UrlBuilderInterceptor],
+  exports: [ShortenerService],
 })
 export class ShortenerModule {}
