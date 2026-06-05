@@ -1,5 +1,18 @@
-import { Controller, Get, Inject, Param, Redirect } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Redirect,
+  UseFilters,
+} from '@nestjs/common';
 import { ShortenerService } from '../../../shortener/src/service/shortener.service';
+import {
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { UrlNotFoundFilter } from '../filter/url-not-found.filter';
 
 @Controller({
   path: '/',
@@ -8,25 +21,14 @@ import { ShortenerService } from '../../../shortener/src/service/shortener.servi
 export class RouterController {
   @Inject(ShortenerService) private readonly shortenService: ShortenerService;
 
-  @Get('/not-found')
-  notFound() {
-    return 'Page not found';
-  }
-
   @Get(':url_code')
   @Redirect()
+  @UseFilters(new UrlNotFoundFilter())
+  @ApiOperation({ summary: 'Redirect URL.' })
+  @ApiResponse({ status: 302, description: 'Redirect to destination URL.' })
+  @ApiNotFoundResponse({ description: 'The URL is not valid or expired' })
   async redirect(@Param('url_code') urlCode: string) {
-    const notFound = { url: 'not-found', code: 404, url_code: urlCode };
-    try {
-      const urlModel = await this.shortenService.getUrlByCode(urlCode);
-      const today = new Date();
-      if (urlModel.expiration_date && urlModel.expiration_date <= today) {
-        return notFound;
-      }
-
-      return { url: urlModel.original_url, code: 302 };
-    } catch (e) {
-      return notFound;
-    }
+    const urlModel = await this.shortenService.getUrlByCode(urlCode);
+    return { url: urlModel.original_url, code: 302 };
   }
 }

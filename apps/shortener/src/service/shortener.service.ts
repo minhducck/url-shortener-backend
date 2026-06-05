@@ -37,6 +37,17 @@ export class ShortenerService {
       .then((result) => result!.toObject());
   }
 
+  async getActiveUrlByCode(code: string): Promise<UrlModel> {
+    const url = await this.getUrlByCode(code);
+    const now = new Date();
+
+    if (url.expiration_date && now > url.expiration_date) {
+      throw new NotFoundException('Url does not exist');
+    }
+
+    return url;
+  }
+
   async isCodeExist(code: string): Promise<boolean> {
     return (
       (await this.urlModel.exists({
