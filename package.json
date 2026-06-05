@@ -82,7 +82,7 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@libs/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@libs/mongoose-connector(|/.*)$": "<rootDir>/libs/mongoose-connector/src/$1"
     }
   },

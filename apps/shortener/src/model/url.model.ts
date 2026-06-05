@@ -6,9 +6,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
-  Matches,
 } from 'class-validator';
+import { IsValidUrlValidator } from '../validators/is-valid-url.validator';
+import { IsValidCustomUrlValidator } from '../validators/is-valid-custom-url.validator';
 
 @ApiSchema()
 @Schema()
@@ -27,16 +27,7 @@ export class UrlModel {
     description: 'Original URL',
     example: 'https://google.com/',
   })
-  @IsNotEmpty()
-  @IsUrl({
-    allow_fragments: false,
-    max_allowed_length: 256,
-    allow_query_components: true,
-    require_protocol: true,
-    require_host: true,
-    require_valid_protocol: true,
-    require_tld: false,
-  })
+  @IsValidUrlValidator()
   original_url: string;
 
   @Prop({ isRequired: false, default: null, index: true })
@@ -45,9 +36,7 @@ export class UrlModel {
     description: 'Alias',
     example: 'hello-world',
   })
-  @IsString()
-  @Matches(/^[a-zA-Z\-_0-9]+$/)
-  @IsOptional()
+  @IsValidCustomUrlValidator()
   custom_url?: string;
 
   @Prop({
@@ -62,7 +51,7 @@ export class UrlModel {
   })
   @IsOptional()
   @IsDateString({ strict: true })
-  expiration_date: Date | null;
+  expiration_date?: Date | null;
 
   @Prop({ allowNull: true, default: null })
   @ApiProperty({
@@ -72,7 +61,7 @@ export class UrlModel {
   @IsString()
   @IsOptional()
   @IsNotEmpty()
-  password: string;
+  password?: string;
 
   @Prop()
   @ApiProperty({ nullable: false, description: 'Created date' })

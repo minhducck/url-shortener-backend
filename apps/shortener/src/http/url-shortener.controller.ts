@@ -8,7 +8,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
   SerializeOptions,
   UseGuards,
   UseInterceptors,
@@ -27,7 +26,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UrlCreationDto } from '../dto/url-creation.dto';
-import { CodeGeneratorService } from '../service/code-generator.service';
 import { UrlBuilderInterceptor } from '../interceptor/url-builder.interceptor';
 import { PasswordProtectedGuard } from '../guard/password-protected.guard';
 import { UrlUpdateDto } from '../dto/url-update.dto';
@@ -42,15 +40,7 @@ import { wrapTimeMeasure } from '@libs/common/helper/wrap-time-measure';
 export class UrlShortenerController {
   private readonly logger: Logger = new Logger('UrlShortenerController');
 
-  constructor(
-    private readonly coreService: ShortenerService,
-    private readonly codeGen: CodeGeneratorService,
-  ) {}
-
-  @Get('/generate-code')
-  generate(@Query('n') n: number) {
-    return this.codeGen.generateCodes(n);
-  }
+  constructor(private readonly coreService: ShortenerService) {}
 
   @Get(':code')
   @UseInterceptors(ClassSerializerInterceptor)
