@@ -1,8 +1,5 @@
-import { Snowflake } from '@sapphire/snowflake';
+import { TwitterSnowflake } from '@sapphire/snowflake';
 
 export const generateULID = (): bigint => {
-  const datetime = Date.now();
-  const snowflake = new Snowflake(datetime);
-
-  return snowflake.generate();
+  return TwitterSnowflake.generate();
 };

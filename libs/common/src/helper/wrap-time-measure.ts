@@ -8,14 +8,16 @@ export const wrapTimeMeasure = async (
   const [hrTimeStartSec, hrTimeStartNano] = process.hrtime();
   const startTime = hrTimeStartSec * 1000 + hrTimeStartNano / 1000000;
 
-  await action();
+  try {
+    return await action();
+  } finally {
+    const [hrEndTimeSec, hrEndTimeNano] = process.hrtime();
+    const endTime = hrEndTimeSec * 1000 + hrEndTimeNano / 1000000;
 
-  const [hrEndTimeSec, hrEndTimeNano] = process.hrtime();
-  const endTime = hrEndTimeSec * 1000 + hrEndTimeNano / 1000000;
-
-  if (logger) {
-    logger.log(`Task: ${task} takes ${endTime - startTime} ms to finish`);
-  } else {
-    console.log(`Task: ${task} takes ${endTime - startTime} ms to finish`);
+    if (logger) {
+      logger.log(`Task: ${task} takes ${endTime - startTime} ms to finish`);
+    } else {
+      console.log(`Task: ${task} takes ${endTime - startTime} ms to finish`);
+    }
   }
 };

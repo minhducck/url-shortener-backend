@@ -1,21 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { ShortenerModule } from '../src/shortener.module';
+import { UrlShortenerController } from '../src/http/url-shortener.controller';
+import { ShortenerService } from '../src/service/shortener.service';
+import { CodeGeneratorService } from '../src/service/code-generator.service';
 
 describe('CoreController (e2e)', () => {
   let app: INestApplication;
+  let urlShortenService: ShortenerService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [ShortenerModule],
+      controllers: [UrlShortenerController],
+      providers: [ShortenerService, CodeGeneratorService],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    urlShortenService = app.get(ShortenerService);
     await app.init();
   });
 
   it('/ (GET)', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
