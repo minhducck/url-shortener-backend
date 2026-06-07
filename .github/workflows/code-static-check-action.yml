@@ -1,0 +1,52 @@
+name: Backend Pipeline
+run-name: ${{ github.actor }} is pushing a new commit 🚀
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  Static-Code-Check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🚨 Code static verification on branch ${{ github.ref }}."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Installing the node engine.
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install service deps
+        run: yarn
+
+      - name: Check Prettier format
+        run: yarn run format -c
+
+      - name: Check ESLint
+        run: yarn run lint
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+  Run-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🚨 Code static verification on branch ${{ github.ref }}."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Installing the node engine.
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install service deps
+        run: yarn
+      - name: Run Tests for app ${{ vars.APPLICATION_NAME }} - Version ${{ vars.APP_VERSION }}
+        run: echo "Running test for $APPLICATION_NAME - Version $APP_VERSION" && ENV=test yarn run test
+        env:
+          APPLICATION_NAME: ${{ vars.APPLICATION_NAME }}
+          APP_VERSION: ${{ vars.APP_VERSION }}
+          APPLICATION_FRONTEND_DOMAIN: ${{ vars.APPLICATION_FRONTEND_DOMAIN }}
+          ENV: ${{ vars.ENV }}
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
