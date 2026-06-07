@@ -48,5 +48,27 @@ jobs:
           APP_VERSION: ${{ vars.APP_VERSION }}
           APPLICATION_FRONTEND_DOMAIN: ${{ vars.APPLICATION_FRONTEND_DOMAIN }}
           ENV: ${{ vars.ENV }}
+          MONGODB:
+            URI: ${{ vars.MONGODB_URI }}
+            DB_NAME: testing
 
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+  Build-Source-Code:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🚨 Code static verification on branch ${{ github.ref }}."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Installing the node engine.
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install service deps
+        run: yarn
+      - run: echo "🚧 build source code on branch ${{ github.ref }}."
+      - name: Run build apps
+        run: yarn run build --all
       - run: echo "🍏 This job's status is ${{ job.status }}."
