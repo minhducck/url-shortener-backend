@@ -48,9 +48,8 @@ jobs:
           APP_VERSION: ${{ vars.APP_VERSION }}
           APPLICATION_FRONTEND_DOMAIN: ${{ vars.APPLICATION_FRONTEND_DOMAIN }}
           ENV: ${{ vars.ENV }}
-          MONGODB:
-            URI: ${{ vars.MONGODB_URI }}
-            DB_NAME: testing
+          MONGODB.URI: ${{ vars.MONGODB_URI }}
+          MONGODB.DB_NAME: testing
 
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
