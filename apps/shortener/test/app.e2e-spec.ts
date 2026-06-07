@@ -8,7 +8,6 @@ import { CodeGeneratorService } from '../src/service/code-generator.service';
 
 describe('CoreController (e2e)', () => {
   let app: INestApplication;
-  let urlShortenService: ShortenerService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -18,7 +17,6 @@ describe('CoreController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    urlShortenService = app.get(ShortenerService);
     await app.init();
   });
 

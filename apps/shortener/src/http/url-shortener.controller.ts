@@ -101,10 +101,7 @@ export class UrlShortenerController {
   @ApiNotFoundResponse({ description: 'Shorten code does not exist' })
   @ApiForbiddenResponse({ description: 'Password not correct.' })
   @ApiOkResponse({ description: 'URL has been removed' })
-  async delete(
-    @Param('code') code: string,
-    @Param('password') password: string,
-  ): Promise<boolean> {
+  async delete(@Param('code') code: string): Promise<boolean> {
     await this.coreService.remove(code);
 
     return true;
