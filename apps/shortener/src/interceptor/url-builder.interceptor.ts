@@ -22,7 +22,7 @@ export class UrlBuilderInterceptor implements NestInterceptor {
         return {
           ...data,
           shorten_url: new URL(
-            data.shortcode,
+            data.custom_url || data.shortcode,
             this.configService.getOrThrow<string>(
               'APPLICATION_FRONTEND_DOMAIN',
             ),
