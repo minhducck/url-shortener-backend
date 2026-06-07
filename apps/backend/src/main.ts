@@ -12,6 +12,7 @@ async function bootstrap() {
   setupStaticAssets(app);
   setupApiVersioning(app);
   setupSwagger(app);
+  app.enableCors({ origin: '*' });
   await app.listen(process.env.PORT ?? 3000);
 }
 
