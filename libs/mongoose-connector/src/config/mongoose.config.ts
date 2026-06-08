@@ -12,11 +12,11 @@ export class MongooseConfig implements MongooseOptionsFactory {
     return {
       appName: this.configService.getOrThrow<string>('APPLICATION_NAME'),
       autoCreate: true,
-      dbName: this.configService.getOrThrow<string>('MONGODB.DB_NAME'),
-      uri: this.configService.getOrThrow<string>('MONGODB.URI'),
+      dbName: this.configService.getOrThrow<string>('MONGODB_DB_NAME'),
+      uri: this.configService.getOrThrow<string>('MONGODB_URI'),
       auth: {
-        username: this.configService.get<string>('MONGODB.AUTH_USERNAME'),
-        password: this.configService.get<string>('MONGODB.AUTH_PASSWORD'),
+        username: this.configService.get<string>('MONGODB_AUTH_USERNAME'),
+        password: this.configService.get<string>('MONGODB_AUTH_PASSWORD'),
       },
     };
   }

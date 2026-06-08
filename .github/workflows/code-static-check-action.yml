@@ -48,10 +48,8 @@ jobs:
           APP_VERSION: ${{ vars.APP_VERSION }}
           APPLICATION_FRONTEND_DOMAIN: ${{ vars.APPLICATION_FRONTEND_DOMAIN }}
           ENV: ${{ vars.ENV }}
-          MONGODB.URI: ${{ vars.MONGODB_URI }}
-          MONGODB.DB_NAME: testing
-
-
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB_NAME: url_shortener_testing
       - run: echo "🍏 This job's status is ${{ job.status }}."
   Build-Source-Code:
     runs-on: ubuntu-latest

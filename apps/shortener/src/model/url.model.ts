@@ -1,6 +1,6 @@
 import { ModelDefinition, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { ApiProperty, ApiSchema } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
   IsNotEmpty,
@@ -10,7 +10,6 @@ import {
 import { IsValidUrlValidator } from '../validators/is-valid-url.validator';
 import { IsValidCustomUrlValidator } from '../validators/is-valid-custom-url.validator';
 
-@ApiSchema()
 @Schema()
 export class UrlModel {
   @Prop({ unique: true, isRequired: true, index: true })
@@ -35,6 +34,7 @@ export class UrlModel {
     nullable: true,
     description: 'Alias',
     example: 'hello-world',
+    required: false,
   })
   @IsValidCustomUrlValidator()
   custom_url?: string;
@@ -48,6 +48,8 @@ export class UrlModel {
     nullable: true,
     description: 'URL expiration date',
     example: '2026-06-04T12:00:00.000Z',
+    type: 'string',
+    required: false,
   })
   @IsOptional()
   @IsDateString({ strict: true })
@@ -57,6 +59,7 @@ export class UrlModel {
   @ApiProperty({
     nullable: false,
     description: 'Password to update the existing URL',
+    required: false,
   })
   @IsString()
   @IsOptional()
