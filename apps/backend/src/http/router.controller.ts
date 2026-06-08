@@ -28,7 +28,7 @@ export class RouterController {
   @ApiResponse({ status: 302, description: 'Redirect to destination URL.' })
   @ApiNotFoundResponse({ description: 'The URL is not valid or expired' })
   async redirect(@Param('url_code') urlCode: string) {
-    const urlModel = await this.shortenService.getUrlByCode(urlCode);
+    const urlModel = await this.shortenService.getActiveUrlByCode(urlCode);
     return { url: urlModel.original_url, code: 302 };
   }
 }

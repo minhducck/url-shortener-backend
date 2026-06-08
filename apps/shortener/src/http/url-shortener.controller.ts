@@ -31,6 +31,7 @@ import { PasswordProtectedGuard } from '../guard/password-protected.guard';
 import { UrlUpdateDto } from '../dto/url-update.dto';
 import { UrlOutputDto } from '../dto/url-output.dto';
 import { wrapTimeMeasure } from '@libs/common/helper/wrap-time-measure';
+import { UrlNoPasswordDto } from '../dto/url-no-password.dto';
 
 @Controller({
   version: 'V1',
@@ -47,16 +48,17 @@ export class UrlShortenerController {
   @UseInterceptors(UrlBuilderInterceptor)
   @SerializeOptions({
     excludePrefixes: ['_'],
+    type: UrlNoPasswordDto,
   })
   @ApiParam({ name: 'code', description: 'Url shortener' })
   @ApiOperation({ summary: 'Retrieve URL metadata by shortened code.' })
   @ApiResponse({ status: 200, description: 'Found the URL' })
   @ApiResponse({ status: 404, description: 'Shorted URL does not exist' })
-  getUrlSetting(@Param('code') code: string): Promise<UrlOutputDto> {
+  getUrlSetting(@Param('code') code: string) {
     return this.coreService.getUrlByCode(code);
   }
 
-  @Post('/')
+  @Post()
   @ApiOperation({ summary: 'Create shorten link for URL' })
   @ApiCreatedResponse({ description: 'URL shorten has been created.' })
   @ApiBody({ type: UrlCreationDto })

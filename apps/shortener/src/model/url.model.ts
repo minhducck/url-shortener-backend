@@ -53,7 +53,7 @@ export class UrlModel {
   })
   @IsOptional()
   @IsDateString({ strict: true })
-  expiration_date?: Date | null;
+  expiration_date?: string | Date | null;
 
   @Prop({ allowNull: true, default: null })
   @ApiProperty({
